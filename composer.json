@@ -1,0 +1,36 @@
+{
+    "name": "matusstafura/magento2-product-redirect",
+    "description": "Product redirect module for Magento 2 - creates store-agnostic product links using SKU or ID",
+    "type": "magento2-module",
+    "license": "MIT",
+    "keywords": [
+        "magento2",
+        "magento",
+        "product",
+        "redirect",
+        "seo",
+        "multilingual",
+        "multi-store",
+        "sku",
+        "module"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "MatusStafura\\ProductRedirect\\": ""
+        }
+    },
+    "authors": [
+        {
+            "name": "Matus Stafura",
+            "homepage": "https://stafura.dev/"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.1",
+        "magento/framework": ">=103.0"
+    },
+}
