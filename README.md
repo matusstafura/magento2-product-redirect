@@ -12,15 +12,6 @@ When managing a Magento 2 multi-store setup with different languages, product UR
 
 This module lets you use **one universal link** that automatically redirects to the correct localized product URL based on the current store.
 
-## Features
-
-✅ **Store-agnostic product links** - One link works across all languages  
-✅ **SEO-friendly 301 redirects** - Passes link equity to final product URLs  
-✅ **Supports SKU and Product ID** - Use whichever identifier suits your workflow  
-✅ **Zero configuration** - Works immediately after installation  
-✅ **Magento 2.4.7 compatible** - Uses modern `HttpGetActionInterface`  
-✅ **Lightweight** - No database changes, no admin configuration  
-
 ## Requirements
 
 - PHP >= 8.1
@@ -29,7 +20,17 @@ This module lets you use **one universal link** that automatically redirects to 
 
 ## Installation
 
-### Option 1: Manual Installation
+### Option 1: Install via Composer (Recommended)
+
+```bash
+composer require matusstafura/magento2-product-redirect
+php bin/magento module:enable MatusStafura_ProductRedirect
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
+php bin/magento cache:flush
+```
+
+### Option 2: Manual Installation
 
 1. Create module directory:
 ```bash
