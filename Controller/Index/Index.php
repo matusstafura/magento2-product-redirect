@@ -24,6 +24,9 @@ class Index implements HttpGetActionInterface
     }
 
     /**
+     * Redirect by SKU or ID to localized product URL
+     * 
+     * Examples:
      * 1. /product?sku=ABC123
      * 2. /product?id=12301
      *
@@ -34,7 +37,7 @@ class Index implements HttpGetActionInterface
         $redirect = $this->redirectFactory->create();
 
         try {
-            $storeId = $this->storeManager->getStore()->getId();
+            $currentStoreId = $this->storeManager->getStore()->getId();
             $product = null;
             $identifier = null;
             $identifierType = null;
@@ -44,7 +47,7 @@ class Index implements HttpGetActionInterface
             if ($sku) {
                 $identifier = $sku;
                 $identifierType = 'SKU';
-                $product = $this->loadProductBySku($sku, $storeId);
+                $product = $this->loadProductBySku($sku, $currentStoreId);
             }
 
             // Priority 2: Check for ID in query parameter
@@ -53,7 +56,7 @@ class Index implements HttpGetActionInterface
                 if ($productId && is_numeric($productId)) {
                     $identifier = $productId;
                     $identifierType = 'ID';
-                    $product = $this->loadProductById($productId, $storeId);
+                    $product = $this->loadProductById($productId, $currentStoreId);
                 }
             }
 
@@ -66,16 +69,24 @@ class Index implements HttpGetActionInterface
                 return $redirect->setPath('/');
             }
 
-            // Get the localized product URL for the current store
-            $productUrl = $product->getProductUrl();
+            // CRITICAL FIX: Reload product in the CURRENT store context to ensure correct URL
+            // This ensures getProductUrl() returns the URL for the current store, not the store
+            // where the product was initially loaded
+            $productInCurrentStore = $this->productRepository->getById(
+                $product->getId(),
+                false,
+                $currentStoreId
+            );
+            
+            $productUrl = $productInCurrentStore->getProductUrl();
 
-            // Log successful redirect (optional, remove in production)
+            // Log successful redirect
             $this->logger->info(sprintf(
-                'ProductRedirect: Redirecting %s "%s" to %s (Store: %s)',
+                'ProductRedirect: Redirecting %s "%s" to %s (Store ID: %s)',
                 $identifierType,
                 $identifier,
                 $productUrl,
-                $storeId
+                $currentStoreId
             ));
 
             // 301 redirect to SEO-friendly URL
@@ -91,7 +102,7 @@ class Index implements HttpGetActionInterface
     }
 
     /**
-     * Load product by SKU
+     * Load product by SKU for a specific store
      *
      * @param string $sku
      * @param int $storeId
@@ -112,7 +123,7 @@ class Index implements HttpGetActionInterface
     }
 
     /**
-     * Load product by ID
+     * Load product by ID for a specific store
      *
      * @param int $productId
      * @param int $storeId
